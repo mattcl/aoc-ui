@@ -2,6 +2,7 @@
   import type { Summary } from './common'
   import Summaries from './Summaries.svelte'
   import CumulativeGraph from './CumulativeGraph.svelte'
+  import PercentRuntimeGraph from './PercentRuntimeGraph.svelte'
   import PerDayGraph from './PerDayGraph.svelte'
 
   let base_url = import.meta.env.VITE_API_BASE;
@@ -18,3 +19,4 @@
 <Summaries year={year} items={items} />
 <PerDayGraph items={items} />
 <CumulativeGraph items={items} />
+<PercentRuntimeGraph items={items} />
