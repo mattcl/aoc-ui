@@ -1,0 +1,166 @@
+resource_types:
+  - name: slack-alert
+    type: registry-image
+    source:
+      repository: arbourd/concourse-slack-alert-resource
+
+  - name: registry-tag
+    type: registry-image
+    source:
+      repository: ghcr.io/tlwr/registry-tag-resource
+      tag: "02a83cea112652acce1bc9b5414609f59d868373"
+
+# common flags we want to set on all jobs
+job-common-settings: &job-common
+  # I guess we want to prevent multiple builds conflicting with each other
+  max_in_flight: 1
+  build_log_retention:
+    days: 2
+    builds: 20
+    minimum_succeeded_builds: 1
+  on_success:
+    put: notify
+    params:
+      alert_type: success
+  on_failure:
+    put: notify
+    params:
+      alert_type: failed
+  on_abort:
+    put: notify
+    params:
+      alert_type: aborted
+  on_error:
+    put: notify
+    params:
+      alert_type: errored
+
+resources:
+  # the user-specified repo under test
+  - name: ((service.name))
+    type: git
+    icon: github
+    source:
+      uri: ((service.repo.uri))
+      ignore_paths:
+        - 'README.md'
+
+  # the user-specified gitops repo
+  - name: ((gitops.name))-gitops
+    type: git
+    icon: github
+    source:
+      uri: ((gitops.repo.uri))
+      private_key: ((github.private-key))
+      branch: master
+
+  - name: ((service.name))-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: ((service.image-repo))
+      username: ((dockerhub.user))
+      password: ((dockerhub.token))
+
+  - name: ((service.name))-image-tag
+    type: registry-tag
+    icon: tag
+    source:
+      uri: ((service.image-repo-api))
+      pages: 1
+      regexp: '^[0-9]+[.][0-9]+[.][0-9]+$'
+      semver:
+        matcher: '>= 0'
+
+  - name: notify
+    type: slack-alert
+    icon: slack
+    source:
+      url: ((slack.webhook-url))
+      channel: ((slack.channel))
+      concourse_url: ((server.url))
+
+jobs:
+  - name: build-image
+    <<: *job-common
+    plan:
+      - in_parallel:
+        - get: ((service.name))
+          trigger: true
+
+      - in_parallel:
+        - task: extract-tags
+          file: ((service.name))/ci/tasks/extract-version-tags.yaml
+          input_mapping:
+            repo: ((service.name))
+          params:
+            IMAGE_REPO: ((service.image-repo))
+        - task: build
+          privileged: true
+          tags:
+            - internal
+          config:
+            platform: linux
+            image_resource:
+              type: registry-image
+              source:
+                repository: concourse/oci-build-task
+            inputs:
+              - name: ((service.name))
+            outputs:
+              - name: image
+            params:
+              CONTEXT: ((service.name))/
+              DOCKERFILE: ((service.name))/Dockerfile
+            run:
+              path: build
+
+      - put: ((service.name))-image
+        params:
+          image: image/image.tar
+          additional_tags: image-tags/tags
+
+  - name: update-gitops-tag
+    <<: *job-common
+    plan:
+      - in_parallel:
+        - get: ((service.name))
+          trigger: false
+          passed:
+            - build-image
+        - get: ((gitops.name))-gitops
+          trigger: false
+        - get: ((service.name))-image-tag
+          trigger: true
+
+      # make the tag available as a var
+      - load_var: image-tag
+        file: ((service.name))-image-tag/tag
+
+      - task: update-tag
+        tags:
+          - internal
+        file: ((service.name))/ci/tasks/update-gitops-tag.yaml
+        input_mapping:
+          repo: ((service.name))
+          gitops: ((gitops.name))-gitops
+        params:
+          OVERLAY: "((gitops.overlay))"
+          IMAGE: "((service.image-repo))"
+          TAG: "((.:image-tag))"
+
+      - task: make-commit
+        tags:
+          - internal
+        file: ((service.name))/ci/tasks/git-commit.yaml
+        input_mapping:
+          ci: ((service.name))
+          repo: gitops
+        output_mapping:
+          repo: gitops
+        params:
+          COMMIT_MESSAGE: "ops: [CD] Auto update ((gitops.overlay)) to ((service.image-repo)):((.:image-tag))"
+
+      - put: ((gitops.name))-gitops
+        params:
+          repository: gitops

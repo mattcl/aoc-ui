@@ -1,0 +1,19 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: mattcl/kustomize-tools
+    tag: "0.2.3"
+
+inputs:
+  - name: repo
+  - name: gitops
+
+outputs:
+  - name: gitops
+
+params:
+  TAG:
+
+run:
+  path: repo/ci/scripts/update-gitops-tag.sh

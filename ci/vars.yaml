@@ -1,0 +1,12 @@
+service:
+  name: aoc-ui
+  repo:
+    uri: https://github.com/mattcl/aoc-ui.git
+  image-repo: mattcl/aoc-ui
+  image-repo-api: https://hub.docker.com/v2/repositories/mattcl/aoc-ui
+
+gitops:
+  name: aoc-web
+  repo:
+    uri: git@github.com:mattcl/hl-aoc-web
+  overlay: installs/default
