@@ -1,5 +1,14 @@
 <script lang="ts">
   let year = 2023;
+
+  let sourceCode = [
+    {name: 'aoc-ci-bencher (CI pipeline defs)', repo: 'https://github.com/mattcl/aoc-ci-bencher' },
+    {name: 'aoc-tools (CI helper)', repo: 'https://github.com/mattcl/aoc-tools' },
+    {name: 'aoc-ui (frontend)', repo: 'https://github.com/mattcl/aoc-ui' },
+    {name: 'aoc-web (backend)', repo: 'https://github.com/mattcl/aoc-web' },
+    {name: 'hl-aoc-ui (kubernetes configs)', repo: 'https://github.com/mattcl/hl-aoc-web' },
+  ];
+
 </script>
 
 <p><a href="https://adventofcode.com">Advent of Code</a> is an advent calendar
@@ -22,3 +31,11 @@ shell startup time.</p>
 
 <p>For 2023 and onward, more detailed results can be found in the
 <a href="https://github.com/mattcl/aoc-benchmarks">benchmarks repo</a>.</p>
+
+<h3>Source code:</h3>
+
+<ul>
+{#each sourceCode as s (s.name) }
+  <li><a href="{s.repo}" target="_blank">{s.name}</li>
+{/each}
+</ul>
