@@ -16,5 +16,5 @@
 </script>
 
 <Summaries year={year} items={items} />
-<CumulativeGraph items={items} />
 <PerDayGraph items={items} />
+<CumulativeGraph items={items} />

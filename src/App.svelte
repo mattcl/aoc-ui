@@ -20,7 +20,7 @@
   >
     <Row>
       <Section>
-        <Title>AOC Comparative Benchmarks</Title>
+        <Title>AoC Comparative Benchmarks</Title>
       </Section>
     </Row>
   </TopAppBar>
