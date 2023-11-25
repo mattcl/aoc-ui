@@ -115,8 +115,8 @@
   </DataTable>
 </div>
 {#if year == 2022}
-<p>2022 is incomplete because it was run before the spec and new benchamrking
-so it's missing some participants It is included here to get a sense of what
+<p>2022 is incomplete because it was run before the spec and new benchamrking,
+so it's missing some participants. It is included here to get a sense of what
 the reporting looks like.</p>
 {/if}
 
