@@ -32,13 +32,7 @@
       selected = participants.filter((x) => year > 2022 || x.name != 'pting').map((x) => x.name);
     });
 
-  // I'm using this function to hide the summaries dependency from the reactive
-  // filteredSummaries, since I don't want changes to that triggering this.
-  function getFiltered(sel: string[]) {
-    return summaries.filter((item) => sel.includes(item.participant));
-  }
-
-  $: filteredSummaries = getFiltered(selected);
+  $: filteredSummaries = summaries.filter((item) => selected.includes(item.participant));
 
   let pipeline = `http://ci.papercode.net:8080/teams/main/pipelines/aoc${year}`
 
