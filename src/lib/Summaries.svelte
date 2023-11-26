@@ -13,9 +13,10 @@
   export let year: number;
   export let summaries: Summary[] = [];
   export let participants: Participant[] = [];
+  export let days: number[] = [];
 
   $: repoMap = makeRepoMap(participants);
-  $: completedCount = makeCompletedMap(summaries);
+  $: completedCount = makeCompletedMap(summaries, days);
 
   let items = [];
   $: {
@@ -53,19 +54,31 @@
     return m;
   }
 
-  function makeCompletedMap(summaries: Summary[]) {
+  function makeCompletedMap(summaries: Summary[], days: number[]) {
     let m = {};
     summaries.map((x) => {
       let count = 0;
-      for (let day = 1; day < 26; day++) {
-        let key = `day_${day}`;
+      days.map((d) => {
+        let key = `day_${d}`;
         if (x[key] !== null) {
           count += 1;
         }
-      }
+      });
       m[x.participant] = count;
     });
     return m;
+  }
+
+  function computeTotal(summary: Summary, days: number[]): number {
+    let t = 0;
+    days.map((d) => {
+        let key = `day_${d}`;
+        if (summary[key] !== null) {
+          t += summary[key];
+        }
+    });
+
+    return t;
   }
 </script>
 
@@ -96,10 +109,10 @@
           <Label>Lang</Label>
           <IconButton class="material-icons">arrow_upward</IconButton>
         </Cell>
-        {#each {length: 25} as _, i}
-          <Cell numeric columnId="day_{i + 1}">
+        {#each days as day}
+          <Cell numeric columnId="day_{day}">
             <IconButton class="material-icons">arrow_upward</IconButton>
-            <Label>Day {i + 1}</Label>
+            <Label>Day {day}</Label>
           </Cell>
         {/each}
         <Cell numeric columnId="total" class="col-stick-right">
@@ -111,34 +124,12 @@
     <Body>
       {#each items as item (item.participant)}
         <Row>
-          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a> ({ completedCount[item.participant] }/25)</Cell>
+          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a> ({ completedCount[item.participant] }/{ days.length })</Cell>
           <Cell>{ item.language }</Cell>
-          <Cell numeric>{ formatNum(item.day_1) }</Cell>
-          <Cell numeric>{ formatNum(item.day_2) }</Cell>
-          <Cell numeric>{ formatNum(item.day_3) }</Cell>
-          <Cell numeric>{ formatNum(item.day_4) }</Cell>
-          <Cell numeric>{ formatNum(item.day_5) }</Cell>
-          <Cell numeric>{ formatNum(item.day_6) }</Cell>
-          <Cell numeric>{ formatNum(item.day_7) }</Cell>
-          <Cell numeric>{ formatNum(item.day_8) }</Cell>
-          <Cell numeric>{ formatNum(item.day_9) }</Cell>
-          <Cell numeric>{ formatNum(item.day_10) }</Cell>
-          <Cell numeric>{ formatNum(item.day_11) }</Cell>
-          <Cell numeric>{ formatNum(item.day_12) }</Cell>
-          <Cell numeric>{ formatNum(item.day_13) }</Cell>
-          <Cell numeric>{ formatNum(item.day_14) }</Cell>
-          <Cell numeric>{ formatNum(item.day_15) }</Cell>
-          <Cell numeric>{ formatNum(item.day_16) }</Cell>
-          <Cell numeric>{ formatNum(item.day_17) }</Cell>
-          <Cell numeric>{ formatNum(item.day_18) }</Cell>
-          <Cell numeric>{ formatNum(item.day_19) }</Cell>
-          <Cell numeric>{ formatNum(item.day_20) }</Cell>
-          <Cell numeric>{ formatNum(item.day_21) }</Cell>
-          <Cell numeric>{ formatNum(item.day_22) }</Cell>
-          <Cell numeric>{ formatNum(item.day_23) }</Cell>
-          <Cell numeric>{ formatNum(item.day_24) }</Cell>
-          <Cell numeric>{ formatNum(item.day_25) }</Cell>
-          <Cell numeric class="col-stick-right">{ formatNum(item.total) }</Cell>
+          {#each days as day}
+            <Cell numeric>{ formatNum(item[`day_${day}`]) }</Cell>
+          {/each}
+          <Cell numeric class="col-stick-right">{ formatNum(computeTotal(item, days)) }</Cell>
         </Row>
       {/each}
     </Body>

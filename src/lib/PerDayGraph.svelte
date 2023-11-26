@@ -3,24 +3,20 @@
   import type { Summary } from './common'
 
   export let items: Summary[] = [];
+  export let days: number[] = [];
 
-  $: data = makeData(items);
+  $: data = makeData(items, days);
 
-  function makeData(raw: Summary[]) {
+  function makeData(raw: Summary[], days: number[]) {
     let d = [];
 
     if (raw.length == 0) {
       return d;
     }
 
-    let days = [];
-    for (let day = 1; day < 26; day++) {
-      days.push(day);
-    }
-
     raw.map((summary) => {
       d.push({
-        x: [...days],
+        x: days,
         y: dataForDays(summary, days),
         name: summary.participant,
         type: 'bar',

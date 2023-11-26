@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type { Summary, Participant } from './common'
-  import Summaries from './Summaries.svelte'
-  import CumulativeGraph from './CumulativeGraph.svelte'
-  import PercentRuntimeGraph from './PercentRuntimeGraph.svelte'
-  import PerDayGraph from './PerDayGraph.svelte'
-  import Checkbox from '@smui/checkbox'
+  import type { Summary, Participant } from './common';
+  import Summaries from './Summaries.svelte';
+  import CumulativeGraph from './CumulativeGraph.svelte';
+  import PercentRuntimeGraph from './PercentRuntimeGraph.svelte';
+  import PerDayGraph from './PerDayGraph.svelte';
+  import Checkbox from '@smui/checkbox';
   import FormField from '@smui/form-field';
+  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
   let base_url = import.meta.env.VITE_API_BASE;
 
@@ -13,11 +14,27 @@
 
   let summaries: Summary[] = [];
   let participants: Participant[] = [];
+  let daysSel = new Array(25).fill(null).map((_, i) => i + 1);
+  let daysFilters = makeDayFilterChunks(daysSel);
 
-  $: filters = participants.map((x) => {
+  function makeDayFilterChunks(days: number[]) {
+    let chunks = new Array(Math.floor(days.length / 10) + 1).fill(null).map((_) => []);
+
+    days.map((d, i) => {
+      let idx = Math.floor(i / 10);
+      console.log(idx);
+      chunks[idx].push({ name: d, disabled: false});
+    });
+
+    return chunks;
+  }
+
+  $: sortedDays = daysSel.toSorted((a, b) => a - b);
+
+  $: partFilters = participants.map((x) => {
     return { name: x.name, disabled: false };
   });
-  let selected = [];
+  let partSel = [];
 
   fetch(`${base_url}/api/v1/summaries?year=${year}`)
     .then((response) => response.json())
@@ -29,23 +46,46 @@
     .then(() => {
       // this is a hack to exclude some very large runtimes from showing by
       // default for 2022 only
-      selected = participants.filter((x) => year > 2022 || x.name != 'pting').map((x) => x.name);
+      partSel = participants.filter((x) => year > 2022 || x.name != 'pting').map((x) => x.name);
     });
 
-  $: filteredSummaries = summaries.filter((item) => selected.includes(item.participant));
+  $: filteredSummaries = summaries.filter((item) => partSel.includes(item.participant));
 
   let pipeline = `http://ci.papercode.net:8080/teams/main/pipelines/aoc${year}`
 
 </script>
 
-<h3>Enabled participants</h3>
 <div>
-  {#each filters as option}
-    <FormField>
-      <Checkbox bind:group={selected} value={option.name} disabled={option.disabled} />
-      <span slot="label">{option.name}</span>
-    </FormField>
-  {/each}
+  <Accordion multiple>
+    <Panel>
+      <Header>Participant filters</Header>
+      <Content>
+        <div>
+          {#each partFilters as option}
+            <FormField>
+              <Checkbox bind:group={partSel} value={option.name} disabled={option.disabled} />
+              <span slot="label">{option.name}</span>
+            </FormField>
+          {/each}
+        </div>
+      </Content>
+    </Panel>
+    <Panel>
+      <Header>Day filters</Header>
+      <Content>
+        {#each daysFilters as chunk}
+          <div>
+            {#each chunk as option}
+              <FormField style="width: 75px;">
+                <Checkbox bind:group={daysSel} value={option.name} disabled={option.disabled} />
+                <span slot="label">{option.name}</span>
+              </FormField>
+            {/each}
+          </div>
+        {/each}
+      </Content>
+    </Panel>
+  </Accordion>
 </div>
 
 {#if year == 2022}
@@ -56,7 +96,7 @@
   <br />
   <a href="{ pipeline }" target="_blank">CI Pipeline</a>
 {/if}
-<Summaries year={year} summaries={filteredSummaries} participants={participants} />
-<PerDayGraph items={filteredSummaries} />
-<CumulativeGraph items={filteredSummaries} />
-<PercentRuntimeGraph items={filteredSummaries} />
+<Summaries year={year} days={sortedDays} summaries={filteredSummaries} participants={participants} />
+<PerDayGraph days={sortedDays} items={filteredSummaries} />
+<CumulativeGraph days={sortedDays} items={filteredSummaries} />
+<PercentRuntimeGraph days={sortedDays} items={filteredSummaries} />
