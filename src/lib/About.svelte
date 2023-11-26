@@ -9,9 +9,16 @@
     {name: 'hl-aoc-ui (kubernetes configs)', repo: 'https://github.com/mattcl/hl-aoc-web' },
   ];
 
+  let other = [
+    {name: 'github', repo: 'https://github.com/mattcl' },
+    {name: 'linkedin', repo: 'https://www.linkedin.com/in/mattcl/' },
+    {name: 'blog', repo: 'https://questionable.engineering/' },
+  ];
+
 </script>
 
-<p><a href="https://adventofcode.com">Advent of Code</a> is an advent calendar
+<p><a href="https://adventofcode.com">Advent of Code</a> is an
+<a href="https://en.wikipedia.org/wiki/Advent_calendar">advent calendar</a>
 comprised of programming puzzles. This is an unofficial alternate comparison
 mechanism that uses solution runtime time instead of the default
 time-to-submission ranking.</p>
@@ -20,7 +27,8 @@ time-to-submission ranking.</p>
 <a href="http://ci.papercode.net:8080/teams/main/pipelines/aoc{year}">CI pipeline</a>
 running on relatively dedicated hardware. Participant solutions are run against
 a variety of valid inputs, with the goal of correcting for differences in input
-complexity and speed individual hardware.</p>
+complexity and speed of an individual's hardware. As a side effect, this also
+ensures submitted solutions will work with any of the official inputs.</p>
 
 <p>The benchmarks themselves are computed using
 <a href="https://github.com/sharkdp/hyperfine">hyperfine</a>, which has the
@@ -32,10 +40,27 @@ shell startup time.</p>
 <p>For 2023 and onward, more detailed results can be found in the
 <a href="https://github.com/mattcl/aoc-benchmarks">benchmarks repo</a>.</p>
 
+<h3>Benchmark hardware</h3>
+
+<p>The rest of the pipeline (individual build steps and solution checking and
+solving) will run on various machines in my build cluster, but benchmarks will
+run in a debian bookworm container running on one of two Beelink SER6 Pros each
+with a Ryzen 7 7735HS and 32 GB of RAM. Benchmark runs on those machines should
+be exclusive, in that they should be the only things running other than the CI
+worker process.</p>
+
 <h3>Source code:</h3>
 
 <ul>
 {#each sourceCode as s (s.name) }
+  <li><a href="{s.repo}" target="_blank">{s.name}</li>
+{/each}
+</ul>
+
+<h3>Other stuff:</h3>
+
+<ul>
+{#each other as s (s.name) }
   <li><a href="{s.repo}" target="_blank">{s.name}</li>
 {/each}
 </ul>
