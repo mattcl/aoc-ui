@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Summary } from './common'
+  import type { Summary, Participant } from './common'
   import Summaries from './Summaries.svelte'
   import CumulativeGraph from './CumulativeGraph.svelte'
   import PercentRuntimeGraph from './PercentRuntimeGraph.svelte'
@@ -9,14 +9,22 @@
 
   export let year: number;
 
-  let items: Summary[] = [];
+  let summaries: Summary[] = [];
+  let participants: Participant[] = [];
 
   fetch(`${base_url}/api/v1/summaries?year=${year}`)
     .then((response) => response.json())
-    .then((json) => (items = json));
+    .then((json) => (summaries = json));
+
+  fetch(`${base_url}/api/v1/participants?year=${year}`)
+    .then((response) => response.json())
+    .then((json) => (participants = json));
+
+
+
 </script>
 
-<Summaries year={year} items={items} />
-<PerDayGraph items={items} />
-<CumulativeGraph items={items} />
-<PercentRuntimeGraph items={items} />
+<Summaries year={year} items={summaries} participants={participants} />
+<PerDayGraph items={summaries} />
+<CumulativeGraph items={summaries} />
+<PercentRuntimeGraph items={summaries} />

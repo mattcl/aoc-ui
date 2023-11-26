@@ -31,3 +31,12 @@ type Summary = {
 };
 
 export type { Summary };
+
+type Participant = {
+  year: number,
+  name: string,
+  language: string,
+  repo: string,
+};
+
+export type { Participant };

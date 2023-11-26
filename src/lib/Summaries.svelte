@@ -8,10 +8,13 @@
     SortValue,
   } from '@smui/data-table';
   import IconButton from '@smui/icon-button';
-  import type { Summary } from './common'
+  import type { Summary, Participant } from './common'
 
   export let year: number;
   export let items: Summary[] = [];
+  export let participants: Participant[] = [];
+
+  $: repoMap = makeRepoMap(participants);
 
   //$: items = summaries.map((x) => x);
   let sort: keyof Summary = "total"
@@ -36,6 +39,12 @@
     }
     // we get back time in seconds
     return (val * 1000).toFixed(3);
+  }
+
+  function makeRepoMap(participants: Participant[]) {
+    let m = {};
+    participants.map((x) => {m[x.name] = x.repo});
+    return m;
   }
 </script>
 
@@ -87,7 +96,7 @@ the reporting looks like.</p>
     <Body>
       {#each items as item (item.participant)}
         <Row>
-          <Cell class="col-stick-left">{ item.participant }</Cell>
+          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a></Cell>
           <Cell>{ item.language }</Cell>
           <Cell numeric>{ formatNum(item.day_1) }</Cell>
           <Cell numeric>{ formatNum(item.day_2) }</Cell>
