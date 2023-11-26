@@ -20,11 +20,19 @@
     .then((response) => response.json())
     .then((json) => (participants = json));
 
-
+  let pipeline = `http://ci.papercode.net:8080/teams/main/pipelines/aoc${year}`
 
 </script>
 
-<Summaries year={year} items={summaries} participants={participants} />
+{#if year == 2022}
+  <p>2022 is incomplete because it was run before the spec and new benchmarking,
+  so it's missing some participants. It is included here to get a sense of what
+  the reporting looks like.</p>
+{:else}
+  <br />
+  <a href="{ pipeline }" target="_blank">CI Pipeline</a>
+{/if}
+<Summaries year={year} summaries={summaries} participants={participants} />
 <PerDayGraph items={summaries} />
 <CumulativeGraph items={summaries} />
 <PercentRuntimeGraph items={summaries} />

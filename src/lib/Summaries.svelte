@@ -11,13 +11,18 @@
   import type { Summary, Participant } from './common'
 
   export let year: number;
-  export let items: Summary[] = [];
+  export let summaries: Summary[] = [];
   export let participants: Participant[] = [];
 
   $: repoMap = makeRepoMap(participants);
-  $: completedCount = makeCompletedMap(items);
+  $: completedCount = makeCompletedMap(summaries);
 
-  //$: items = summaries.map((x) => x);
+  let items = [];
+  $: {
+    items = summaries.map((x) => x);
+    handleSort();
+  }
+
   let sort: keyof Summary = "total"
   let sortDirection: LowerCase<keyof typeof sortValue> = 'ascending';
 
@@ -64,18 +69,12 @@
   }
 </script>
 
-{#if year == 2022}
-<p>2022 is incomplete because it was run before the spec and new benchmarking,
-so it's missing some participants. It is included here to get a sense of what
-the reporting looks like.</p>
-{/if}
-
 <h2>Overview</h2>
 
 {#if items.length == 0}
   <p>no data yet</p>
 {:else}
-  <p>time in milliseconds<p>
+  <p>times are in milliseconds<p>
 {/if}
 
 <div class="summary-table">
