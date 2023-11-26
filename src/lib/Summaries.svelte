@@ -15,6 +15,7 @@
   export let participants: Participant[] = [];
 
   $: repoMap = makeRepoMap(participants);
+  $: completedCount = makeCompletedMap(items);
 
   //$: items = summaries.map((x) => x);
   let sort: keyof Summary = "total"
@@ -46,6 +47,21 @@
     participants.map((x) => {m[x.name] = x.repo});
     return m;
   }
+
+  function makeCompletedMap(summaries: Summary[]) {
+    let m = {};
+    summaries.map((x) => {
+      let count = 0;
+      for (let day = 1; day < 26; day++) {
+        let key = `day_${day}`;
+        if (x[key] !== null) {
+          count += 1;
+        }
+      }
+      m[x.participant] = count;
+    });
+    return m;
+  }
 </script>
 
 {#if year == 2022}
@@ -74,7 +90,7 @@ the reporting looks like.</p>
     <Head>
       <Row>
         <Cell columnId="participant" class="col-stick-left">
-          <Label>Participant</Label>
+          <Label>Participant (completed)</Label>
           <IconButton class="material-icons">arrow_upward</IconButton>
         </Cell>
         <Cell columnId="language">
@@ -96,7 +112,7 @@ the reporting looks like.</p>
     <Body>
       {#each items as item (item.participant)}
         <Row>
-          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a></Cell>
+          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a> ({ completedCount[item.participant] }/25)</Cell>
           <Cell>{ item.language }</Cell>
           <Cell numeric>{ formatNum(item.day_1) }</Cell>
           <Cell numeric>{ formatNum(item.day_2) }</Cell>
