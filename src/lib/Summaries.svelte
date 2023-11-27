@@ -27,9 +27,43 @@
   let sort: keyof Summary = "total"
   let sortDirection: LowerCase<keyof typeof sortValue> = 'ascending';
 
+  function computeTotal(summary: Summary, days: number[]): number {
+    let t = 0;
+    days.map((d) => {
+        let key = `day_${d}`;
+        if (summary[key] !== null) {
+          t += summary[key];
+        }
+    });
+
+    return t;
+  }
+
+  function makeComputedTotals(summaries: Summary[], days: number[]) {
+    let out = {};
+    summaries.map((x) => {
+      out[x.participant] = computeTotal(x, days)
+    });
+    return out;
+  };
+
+  let computedTotals = {};
+  $: {
+    computedTotals = makeComputedTotals(summaries, days);
+    handleSort();
+  };
+
+  function getVal(summary: Summary, key: string) {
+    if (key === 'total') {
+      return computedTotals[summary.participant];
+    } else {
+      return summary[key];
+    }
+  }
+
   function handleSort() {
     items.sort((a, b) => {
-      const [aVal, bVal] = [a[sort], b[sort]][
+      const [aVal, bVal] = [getVal(a, sort), getVal(b, sort)][
         sortDirection === 'ascending' ? 'slice' : 'reverse'
       ]();
       if (typeof aVal === 'string' && typeof bVal === 'string') {
@@ -67,18 +101,6 @@
       m[x.participant] = count;
     });
     return m;
-  }
-
-  function computeTotal(summary: Summary, days: number[]): number {
-    let t = 0;
-    days.map((d) => {
-        let key = `day_${d}`;
-        if (summary[key] !== null) {
-          t += summary[key];
-        }
-    });
-
-    return t;
   }
 </script>
 
@@ -129,7 +151,7 @@
           {#each days as day}
             <Cell numeric>{ formatNum(item[`day_${day}`]) }</Cell>
           {/each}
-          <Cell numeric class="col-stick-right">{ formatNum(computeTotal(item, days)) }</Cell>
+          <Cell numeric class="col-stick-right">{ formatNum(computedTotals[item.participant]) }</Cell>
         </Row>
       {/each}
     </Body>

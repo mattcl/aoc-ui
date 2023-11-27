@@ -23,7 +23,6 @@
 
     days.map((d, i) => {
       let idx = Math.floor(i / 10);
-      console.log(idx);
       chunks[idx].push({ name: d, disabled: false});
     });
 
