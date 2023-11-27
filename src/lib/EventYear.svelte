@@ -7,6 +7,7 @@
   import Checkbox from '@smui/checkbox';
   import FormField from '@smui/form-field';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
+  import Button from '@smui/button';
 
   let base_url = import.meta.env.VITE_API_BASE;
 
@@ -36,6 +37,22 @@
   });
   let partSel = [];
 
+  function setPartAll(state) {
+    if (state == true) {
+      partSel = participants.map((x) => x.name);
+    } else {
+      partSel = [];
+    }
+  };
+
+  function setDayAll(state) {
+    if (state == true) {
+      daysSel = new Array(25).fill(null).map((_, i) => i + 1);
+    } else {
+      daysSel = [];
+    }
+  };
+
   fetch(`${base_url}/api/v1/summaries?year=${year}`)
     .then((response) => response.json())
     .then((json) => (summaries = json));
@@ -61,6 +78,10 @@
       <Header>Participant filters</Header>
       <Content>
         <div>
+          <Button on:click={() => setPartAll(true)}>Select all</Button>
+          <Button on:click={() => setPartAll(false)}>Select none</Button>
+        </div>
+        <div>
           {#each partFilters as option}
             <FormField>
               <Checkbox bind:group={partSel} value={option.name} disabled={option.disabled} />
@@ -73,6 +94,10 @@
     <Panel>
       <Header>Day filters</Header>
       <Content>
+        <div>
+          <Button on:click={() => setDayAll(true)}>Select all</Button>
+          <Button on:click={() => setDayAll(false)}>Select none</Button>
+        </div>
         {#each daysFilters as chunk}
           <div>
             {#each chunk as option}
