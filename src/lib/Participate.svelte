@@ -25,9 +25,9 @@ pipeline.</p>
 
 <h3>Templates</h3>
 
-<p>As mentioned in the specification, there are some templates for rust and
-python projects that will conform to the specification. Templates for other
-languages may be added later (contributions also welcome).</p>
+<p>As mentioned in the specification document, there are some templates for
+rust and python projects that implement the spec. Templates for other languages
+may be added later (contributions also welcome).</p>
 
 <ul>
   {#each templates as template (template.lang) }
