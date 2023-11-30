@@ -29,8 +29,6 @@
     return chunks;
   }
 
-  $: sortedDays = daysSel.toSorted((a, b) => a - b);
-
   $: partFilters = participants.map((x) => {
     return { name: x.name, disabled: false };
   });
@@ -52,9 +50,48 @@
     }
   };
 
+  function setDayAvailable(summaries: Summary[], all: bool = false) {
+    let vals = [];
+    for (let i = 1; i < 26; i++) {
+      let key = `day_${i}`;
+
+      if (all) {
+        let all_have = true;
+        for (let s = 0; s < summaries.length; s++) {
+          if (summaries[s][key] === null) {
+            all_have = false;
+            break;
+          }
+        }
+        if (all_have) {
+          vals.push(i);
+        }
+      } else {
+        for (let s = 0; s < summaries.length; s++) {
+          if (summaries[s][key] != null) {
+            vals.push(i);
+            break;
+          }
+        }
+      }
+    }
+
+    // always show at least one day
+    if (vals.length == 0) {
+      vals = [1];
+    }
+
+    daysSel = vals;
+  }
+
   fetch(`${base_url}/api/v1/summaries?year=${year}`)
     .then((response) => response.json())
-    .then((json) => (summaries = json));
+    .then((json) => (summaries = json))
+    .then(() => {
+        if (summaries.length > 0) {
+          setDayAvailable(summaries);
+        }
+    });
 
   fetch(`${base_url}/api/v1/participants?year=${year}`)
     .then((response) => response.json())
@@ -67,6 +104,8 @@
 
   $: filteredSummaries = summaries.filter((item) => partSel.includes(item.participant));
 
+  $: sortedDays = daysSel.toSorted((a, b) => a - b);
+
   let pipeline = `http://ci.papercode.net:8080/teams/main/pipelines/aoc${year}`
 
 </script>
@@ -77,8 +116,9 @@
       <Header>Participant filters</Header>
       <Content>
         <div>
-          <Button on:click={() => setPartAll(true)}>Select all</Button>
-          <Button on:click={() => setPartAll(false)}>Select none</Button>
+          Select
+          <Button on:click={() => setPartAll(true)}>all</Button>
+          <Button on:click={() => setPartAll(false)}>none</Button>
         </div>
         <div>
           {#each partFilters as option}
@@ -94,8 +134,11 @@
       <Header>Day filters</Header>
       <Content>
         <div>
-          <Button on:click={() => setDayAll(true)}>Select all</Button>
-          <Button on:click={() => setDayAll(false)}>Select none</Button>
+          Select
+          <Button on:click={() => setDayAll(true)}>all</Button>
+          <Button on:click={() => setDayAll(false)}>none</Button>
+          <Button on:click={() => setDayAvailable(filteredSummaries)}>any participant solved</Button>
+          <Button on:click={() => setDayAvailable(filteredSummaries, true)}>all participants solved</Button>
         </div>
         {#each daysFilters as chunk}
           <div>
