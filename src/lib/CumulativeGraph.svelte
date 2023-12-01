@@ -34,7 +34,8 @@
   ];
   $: colorway = days.map((d) => defaultColors[d - 1]);
 
-  $: data = makeData(items, days);
+  $: sortedItems = items.toSorted((a, b) => a.participant.localeCompare(b.participant));
+  $: data = makeData(sortedItems, days);
 
   function makeData(raw: Summary[], days: number[]) {
     let d = [];
@@ -43,7 +44,7 @@
       return d;
     }
 
-    let participants = items.map((x) => `${x.participant} (${x.language})`);
+    let participants = raw.map((x) => `${x.participant} (${x.language})`);
 
     days.map((day) => {
       let dayData = dataForDay(raw, day);

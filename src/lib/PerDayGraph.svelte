@@ -13,7 +13,8 @@
   let scaleOptions = ['linear', 'log'];
   let scale = 'linear';
 
-  $: data = makeData(items, days);
+  $: sortedItems = items.toSorted((a, b) => a.participant.localeCompare(b.participant));
+  $: data = makeData(sortedItems, days);
 
   function makeData(raw: Summary[], days: number[]) {
     let d = [];
