@@ -66,6 +66,16 @@
       const [aVal, bVal] = [getVal(a, sort), getVal(b, sort)][
         sortDirection === 'ascending' ? 'slice' : 'reverse'
       ]();
+
+      // put the nulls as the 'end' of the list regardless of sort direction
+      if (aVal === null) {
+        return sortDirection === 'ascending' ? 1 : -1;
+      }
+
+      if (bVal === null) {
+        return sortDirection === 'ascending' ? -1 : 1;
+      }
+
       if (typeof aVal === 'string' && typeof bVal === 'string') {
         return aVal.localeCompare(bVal);
       }
