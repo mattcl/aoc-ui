@@ -71,16 +71,18 @@
 
     summaries.forEach(summary => {
       let total = 0;
+      let anyVirtual = false;
       days.forEach(day => {
         const key = `day_${day}`;
         const val = summary[key];
         if (val === null && day in largestPerDay) {
           total += largestPerDay[day];
+          anyVirtual = true;
         } else {
           total += val;
         }
       });
-      out[summary.participant] = total;
+      out[summary.participant] = {total: total, anyVirtual: anyVirtual};
     });
 
     return out;
@@ -94,10 +96,14 @@
 
   function getVal(summary: Summary, key: string) {
     if (key === 'total') {
-      return virtualTotals[summary.participant];
+      return virtualTotals[summary.participant]['total'];
     } else {
       return summary[key];
     }
+  }
+
+  function hasPenalty(summary: Summary) {
+    return virtualTotals[summary.participant]['anyVirtual'];
   }
 
   function handleSort() {
@@ -211,7 +217,11 @@
               <Cell numeric>{ formatNum(item[`day_${day}`]) }</Cell>
             {/if}
           {/each}
-          <Cell numeric class="col-stick-right">{ formatNum(computedTotals[item.participant]) }</Cell>
+          {#if hasPenalty(item) }
+            <Cell numeric class="col-stick-right" style="color: darkgrey;">{ formatNum(computedTotals[item.participant]) }</Cell>
+          {:else}
+            <Cell numeric class="col-stick-right">{ formatNum(computedTotals[item.participant]) }</Cell>
+          {/if}
         </Row>
       {/each}
     </Body>
@@ -222,7 +232,9 @@
 time for a given day, which is added to a participant's virtual total for days
 that the participant has not implemented a solution. This results in a better
 estimate of overall performance ranking when sorting by total, even if the
-actual total numbers appear out of order.</p>
+actual total numbers appear out of order. Totals that are adjusted in their
+sort order because of this will be <span style="color: darkgrey;">grayed
+out.</span></p>
 
 <style>
   .summary-table {
