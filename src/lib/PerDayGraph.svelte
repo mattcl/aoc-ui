@@ -59,7 +59,7 @@
     {data}
     layout={{
       colorway: defaultColors,
-      height: 500,
+      height: 700,
       yaxis: {
         title: {
           text: "Time (ms)"
