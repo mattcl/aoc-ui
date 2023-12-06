@@ -164,7 +164,11 @@
           <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a> ({ completedCount[item.participant] }/{ days.length })</Cell>
           <Cell>{ item.language }</Cell>
           {#each days as day}
-            <Cell numeric>{ formatNum(item[`day_${day}`]) }</Cell>
+            {#if item[`day_${day}`] === null }
+              <Cell numeric style="color: darkgrey;">{ formatNum(item[`day_${day}`]) }</Cell>
+            {:else}
+              <Cell numeric>{ formatNum(item[`day_${day}`]) }</Cell>
+            {/if}
           {/each}
           <Cell numeric class="col-stick-right">{ formatNum(computedTotals[item.participant]) }</Cell>
         </Row>
