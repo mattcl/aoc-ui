@@ -218,7 +218,11 @@
   </DataTable>
 </div>
 
-<p>* Total sorting uses a virtual total computed using a penalty of the slowest time for a given day, which is added to a participant's virtual total. This results in a better estimate of overall performance ranking when sorting by total, even if the actual total numbers appear out of order.</p>
+<p>* Total sorting uses a virtual total computed using a penalty of the slowest
+time for a given day, which is added to a participant's virtual total for days
+that the participant has not implemented a solution. This results in a better
+estimate of overall performance ranking when sorting by total, even if the
+actual total numbers appear out of order.</p>
 
 <style>
   .summary-table {
