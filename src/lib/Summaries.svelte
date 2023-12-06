@@ -8,6 +8,8 @@
     SortValue,
   } from '@smui/data-table';
   import IconButton from '@smui/icon-button';
+  import Tooltip, { Wrapper } from '@smui/tooltip';
+
   import type { Summary, Participant } from './common'
 
   export let year: number;
@@ -218,7 +220,10 @@
             {/if}
           {/each}
           {#if hasPenalty(item) }
-            <Cell numeric class="col-stick-right" style="color: darkgrey;">{ formatNum(computedTotals[item.participant]) }</Cell>
+            <Wrapper>
+              <Cell numeric class="col-stick-right" style="color: darkgrey;">{ formatNum(computedTotals[item.participant]) }</Cell>
+              <Tooltip class="high-tooltip">Vrtual total: { formatNum(virtualTotals[item.participant]['total']) }</Tooltip>
+            </Wrapper>
           {:else}
             <Cell numeric class="col-stick-right">{ formatNum(computedTotals[item.participant]) }</Cell>
           {/if}
@@ -228,23 +233,27 @@
   </DataTable>
 </div>
 
-<p>* Total sorting uses a virtual total computed using a penalty of the slowest
-time for a given day, which is added to a participant's virtual total for days
-that the participant has not implemented a solution. This results in a better
-estimate of overall performance ranking when sorting by total, even if the
-actual total numbers appear out of order. Totals that are adjusted in their
-sort order because of this will be <span style="color: darkgrey;">grayed
-out.</span></p>
+<p>* Total sorting uses a virtual total. If a participant has not solved a
+particular day, the <i>slowest</i> time for that day is added to their virtual
+total. This results in a better estimate of overall performance ranking when
+sorting by total, even if the actual total numbers appear out of order. Totals
+that are adjusted in their sort order because of this will be <span
+style="color: darkgrey;">grayed out</span>, and their virtual total can be seen
+by hovering over the actual total</p>
 
 <style>
   .summary-table {
     overflow: hidden;
   }
 
+  :global(.high-tooltip) {
+    z-index: 2000;
+  }
+
   .summary-table :global(.col-stick-left) {
     position: sticky;
     left: 0;
-    z-index: 9999;
+    z-index: 1000;
     background: var(--mdc-theme-surface, #fff);
     border-right-width: 1px;
     border-right-style: solid;
@@ -255,7 +264,7 @@ out.</span></p>
   .summary-table :global(.col-stick-right) {
     position: sticky;
     right: 0;
-    z-index: 9999;
+    z-index: 1000;
     background: var(--mdc-theme-surface, #fff);
     margin-right: 2px;
     border-left-width: 1px;
