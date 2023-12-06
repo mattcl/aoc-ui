@@ -63,9 +63,14 @@
 
   function handleSort() {
     items.sort((a, b) => {
-      const [aVal, bVal] = [getVal(a, sort), getVal(b, sort)][
+      let [aVal, bVal] = [getVal(a, sort), getVal(b, sort)][
         sortDirection === 'ascending' ? 'slice' : 'reverse'
       ]();
+
+      // always sort alpha ascending on name to break ties for null values
+      if (aVal === null && bVal ===null) {
+        return getVal(a, 'participant').localeCompare(getVal(b, 'participant'));
+      }
 
       // put the nulls as the 'end' of the list regardless of sort direction
       if (aVal === null) {
