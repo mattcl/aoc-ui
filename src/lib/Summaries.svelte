@@ -17,6 +17,8 @@
 
   $: repoMap = makeRepoMap(participants);
   $: completedCount = makeCompletedMap(summaries, days);
+  $: largestPerDay = getLargestPerDay(summaries, days);
+  $: virtualTotals = makeVirtualTotals(summaries, days, largestPerDay);
 
   let items = [];
   $: {
@@ -47,6 +49,43 @@
     return out;
   };
 
+  function getLargestPerDay(sumamries: Summary[], days: number[]) {
+    let out = {};
+    days.forEach(day => {
+      let max = 0;
+      summaries.forEach(summary => {
+        const key = `day_${day}`;
+        const val = summary[key];
+        if (val !== null && val > max) {
+          max = val;
+        }
+      });
+      out[day] = max;
+    });
+
+    return out;
+  }
+
+  function makeVirtualTotals(sumamries: Summary[], days: number[], largestPerDay) {
+    let out = {};
+
+    summaries.forEach(summary => {
+      let total = 0;
+      days.forEach(day => {
+        const key = `day_${day}`;
+        const val = summary[key];
+        if (val === null && day in largestPerDay) {
+          total += largestPerDay[day];
+        } else {
+          total += val;
+        }
+      });
+      out[summary.participant] = total;
+    });
+
+    return out;
+  }
+
   let computedTotals = {};
   $: {
     computedTotals = makeComputedTotals(summaries, days);
@@ -55,7 +94,7 @@
 
   function getVal(summary: Summary, key: string) {
     if (key === 'total') {
-      return computedTotals[summary.participant];
+      return virtualTotals[summary.participant];
     } else {
       return summary[key];
     }
@@ -63,7 +102,9 @@
 
   function handleSort() {
     items.sort((a, b) => {
-      let [aVal, bVal] = [getVal(a, sort), getVal(b, sort)][
+      let s = sort;
+
+      let [aVal, bVal] = [getVal(a, s), getVal(b, s)][
         sortDirection === 'ascending' ? 'slice' : 'reverse'
       ]();
 
@@ -153,8 +194,8 @@
           </Cell>
         {/each}
         <Cell numeric columnId="total" class="col-stick-right">
-          <Label>Total</Label>
           <IconButton class="material-icons">arrow_upward</IconButton>
+          <Label>Total*</Label>
         </Cell>
       </Row>
     </Head>
@@ -176,6 +217,8 @@
     </Body>
   </DataTable>
 </div>
+
+<p>* Total sorting uses a virtual total computed using a penalty of the slowest time for a given day, which is added to a participant's virtual total. This results in a better estimate of overall performance ranking when sorting by total, even if the actual total numbers appear out of order.</p>
 
 <style>
   .summary-table {
