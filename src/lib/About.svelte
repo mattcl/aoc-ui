@@ -33,9 +33,9 @@ ensures submitted solutions will work with any of the official inputs.</p>
 <p>The benchmarks themselves are computed using
 <a href="https://github.com/sharkdp/hyperfine">hyperfine</a>, which has the
 effect of testing the entirety of program startup, reading the input from disk,
-and computing the solution. As such, there is high variance for times less than
-5 ms, as per the hyperfine documentation, as a not insignificant part of that is
-shell startup time.</p>
+and computing the solution (cold-start time). As such, there is high variance
+for times less than 5 ms, as per the hyperfine documentation, as a not
+insignificant part of that is shell startup time.</p>
 
 <p>For 2023 and onward, more detailed results can be found in the
 <a href="https://github.com/mattcl/aoc-benchmarks">benchmarks repo</a>.</p>

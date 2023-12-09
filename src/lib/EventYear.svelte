@@ -34,11 +34,30 @@
   });
   let partSel = [];
 
+  let uniqueLanguages = [];
+  $: {
+    uniqueLanguages = [...new Set(participants.map(x => x.language))].toSorted((a, b) => a.localeCompare(b));
+  }
+
+  let langSel = [];
+
+  $: langFilters = uniqueLanguages.map((x) => {
+    return { name: x, disabled: false };
+  });
+
   function setPartAll(state) {
     if (state == true) {
-      partSel = participants.map((x) => x.name);
+      partSel = summaries.map((x) => x.participant);
     } else {
       partSel = [];
+    }
+  };
+
+  function setLangAll(state) {
+    if (state == true) {
+      langSel = [...uniqueLanguages];
+    } else {
+      langSel = [];
     }
   };
 
@@ -100,9 +119,11 @@
       // this is a hack to exclude some very large runtimes from showing by
       // default for 2022 only
       partSel = participants.filter((x) => year > 2022 || x.name != 'pting').map((x) => x.name);
+      langSel = [...new Set(participants.map(x => x.language))].toSorted((a, b) => a.localeCompare(b));
+
     });
 
-  $: filteredSummaries = summaries.filter((item) => partSel.includes(item.participant));
+  $: filteredSummaries = summaries.filter((item) => partSel.includes(item.participant) && langSel.includes(item.language));
 
   $: sortedDays = daysSel.toSorted((a, b) => a - b);
 
@@ -124,6 +145,24 @@
           {#each partFilters as option}
             <FormField>
               <Checkbox bind:group={partSel} value={option.name} disabled={option.disabled} />
+              <span slot="label">{option.name}</span>
+            </FormField>
+          {/each}
+        </div>
+      </Content>
+    </Panel>
+    <Panel>
+      <Header>Language filters</Header>
+      <Content>
+        <div>
+          Select
+          <Button on:click={() => setLangAll(true)}>all</Button>
+          <Button on:click={() => setLangAll(false)}>none</Button>
+        </div>
+        <div>
+          {#each langFilters as option}
+            <FormField>
+              <Checkbox bind:group={langSel} value={option.name} disabled={option.disabled} />
               <span slot="label">{option.name}</span>
             </FormField>
           {/each}

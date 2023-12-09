@@ -21,6 +21,7 @@
   $: completedCount = makeCompletedMap(summaries, days);
   $: largestPerDay = getLargestPerDay(summaries, days);
   $: virtualTotals = makeVirtualTotals(summaries, days, largestPerDay);
+  $: smallestPerDay = getSmallestPerDay(summaries, days);
 
   let items = [];
   $: {
@@ -43,14 +44,6 @@
     return t;
   }
 
-  function makeComputedTotals(summaries: Summary[], days: number[]) {
-    let out = {};
-    summaries.map((x) => {
-      out[x.participant] = computeTotal(x, days)
-    });
-    return out;
-  };
-
   function getLargestPerDay(sumamries: Summary[], days: number[]) {
     let out = {};
     days.forEach(day => {
@@ -63,6 +56,23 @@
         }
       });
       out[day] = max;
+    });
+
+    return out;
+  }
+
+  function getSmallestPerDay(sumamries: Summary[], days: number[]) {
+    let out = {};
+    days.forEach(day => {
+      let min = 1000000; // this is higher than we would allow anyway
+      summaries.forEach(summary => {
+        const key = `day_${day}`;
+        const val = summary[key];
+        if (val !== null && val < min) {
+          min = val;
+        }
+      });
+      out[day] = min;
     });
 
     return out;
@@ -93,7 +103,32 @@
   let computedTotals = {};
   $: {
     computedTotals = makeComputedTotals(summaries, days);
+
     handleSort();
+  };
+
+  $: smallestTotal = getSmallestTotal(summaries, virtualTotals);
+
+  function getSmallestTotal(summaries, virtualTotals) {
+    let min = 1000000;
+    summaries.forEach((x) => {
+      let v = virtualTotals[x.participant].total;
+      if (v < min) {
+        min = v;
+      }
+    });
+
+    return min;
+  }
+
+  function makeComputedTotals(summaries: Summary[], days: number[]) {
+    let out = {};
+    summaries.map((x) => {
+      let v = computeTotal(x, days)
+      out[x.participant] = v;
+    });
+
+    return out;
   };
 
   function getVal(summary: Summary, key: string) {
@@ -173,7 +208,9 @@
 {#if items.length == 0}
   <p>no data yet</p>
 {:else}
-  <p>times are in milliseconds<p>
+  <p>Benchmarks run with <a href="https://github.com/sharkdp/hyperfine"><code>hyperfine</code></a> and reflect the cold-start time to solve a given day.
+  </p>
+  <p>Reported times are in milliseconds, and the best time is <span class="fastest">highlighted.</span><p>
 {/if}
 
 <div class="summary-table">
@@ -215,6 +252,8 @@
           {#each days as day}
             {#if item[`day_${day}`] === null }
               <Cell numeric style="color: darkgrey;">{ formatNum(item[`day_${day}`]) }</Cell>
+            {:else if item[`day_${day}`] == smallestPerDay[day] }
+              <Cell numeric class="fastest">{ formatNum(item[`day_${day}`]) }</Cell>
             {:else}
               <Cell numeric>{ formatNum(item[`day_${day}`]) }</Cell>
             {/if}
@@ -224,8 +263,10 @@
               <Cell numeric class="col-stick-right" style="color: darkgrey;">{ formatNum(computedTotals[item.participant]) }</Cell>
               <Tooltip class="high-tooltip">Vrtual total: { formatNum(virtualTotals[item.participant]['total']) }</Tooltip>
             </Wrapper>
+          {:else if computedTotals[item.participant] == smallestTotal }
+            <Cell numeric class="col-stick-right fastest">{ formatNum(computedTotals[item.participant]) }</Cell>
           {:else}
-            <Cell numeric class="col-stick-right">{ formatNum(computedTotals[item.participant]) }</Cell>
+            <Cell numeric class="col-stick-right other">{ formatNum(computedTotals[item.participant]) }</Cell>
           {/if}
         </Row>
       {/each}
@@ -248,6 +289,11 @@ by hovering over the actual total</p>
 
   :global(.high-tooltip) {
     z-index: 2000;
+  }
+
+  :global(.fastest) {
+    color: orangered;
+    font-weight: 600;
   }
 
   .summary-table :global(.col-stick-left) {
