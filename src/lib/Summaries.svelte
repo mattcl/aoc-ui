@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
   import DataTable, {
     Head,
     Body,
@@ -175,10 +175,6 @@
     });
     items = [...items];
 
-    onMount(() => {
-      const scrollElement = tableElement.querySelector('.mdc-data-table__table-container');
-      scrollElement.scrollLeft = scrollElement.scrollWidth;
-    });
   }
 
   function formatNum(val: number | null): string {
@@ -209,6 +205,13 @@
     });
     return m;
   }
+
+  onMount(async () => {
+    setTimeout(() => {
+      const scrollElement = tableElement.querySelector('.mdc-data-table__table-container');
+      scrollElement.scrollLeft = scrollElement.scrollWidth;
+    }, 100);
+  });
 </script>
 
 <h2>Overview</h2>
