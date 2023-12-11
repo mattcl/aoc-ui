@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import DataTable, {
     Head,
     Body,
@@ -16,6 +17,8 @@
   export let summaries: Summary[] = [];
   export let participants: Participant[] = [];
   export let days: number[] = [];
+
+  let tableElement;
 
   $: repoMap = makeRepoMap(participants);
   $: completedCount = makeCompletedMap(summaries, days);
@@ -171,6 +174,11 @@
       return Number(aVal) - Number(bVal);
     });
     items = [...items];
+
+    onMount(() => {
+      const scrollElement = tableElement.querySelector('.mdc-data-table__table-container');
+      scrollElement.scrollLeft = scrollElement.scrollWidth;
+    });
   }
 
   function formatNum(val: number | null): string {
@@ -213,7 +221,7 @@
   <p>Reported times are in milliseconds, and the best time is <span class="fastest">highlighted.</span><p>
 {/if}
 
-<div class="summary-table">
+<div class="summary-table" bind:this={tableElement}>
   <DataTable
     sortable
     bind:sort
