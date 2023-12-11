@@ -236,11 +236,7 @@
     <Head>
       <Row>
         <Cell columnId="participant" class="col-stick-left">
-          <Label>Participant (completed)</Label>
-          <IconButton class="material-icons">arrow_upward</IconButton>
-        </Cell>
-        <Cell columnId="language">
-          <Label>Lang</Label>
+          <Label>Participant / Language</Label>
           <IconButton class="material-icons">arrow_upward</IconButton>
         </Cell>
         {#each days as day}
@@ -258,8 +254,7 @@
     <Body>
       {#each items as item (item.participant)}
         <Row>
-          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a> ({ completedCount[item.participant] }/{ days.length })</Cell>
-          <Cell>{ item.language }</Cell>
+          <Cell class="col-stick-left"><a href="{ repoMap[item.participant] }" target="_blank">{ item.participant }</a> / { item.language }</Cell>
           {#each days as day}
             {#if item[`day_${day}`] === null }
               <Cell numeric style="color: darkgrey;">{ formatNum(item[`day_${day}`]) }</Cell>
