@@ -88,7 +88,7 @@
         const key = `day_${day}`;
         const val = summary[key];
         if (val === null && day in largestPerDay) {
-          total += largestPerDay[day];
+          total += largestPerDay[day] + 0.001;
           anyVirtual = true;
         } else {
           total += val;
@@ -275,9 +275,10 @@
 </div>
 
 <p>* Total sorting uses a virtual total. If a participant has not solved a
-particular day, the <i>slowest</i> time for that day is added to their virtual
-total. This results in a better estimate of overall performance ranking when
-sorting by total, even if the actual total numbers appear out of order. Totals
+particular day, the <i>slowest</i> time for that day <i>plus one
+millisecond</i> is added to their virtual total. This results in a better
+estimate of overall performance ranking, while preferring participants who have
+submitted solutions. As a result, actual totals may appear out of order. Totals
 that are adjusted in their sort order because of this will be <span
 style="color: darkgrey;">grayed out</span>, and their virtual total can be seen
 by hovering over the actual total</p>
