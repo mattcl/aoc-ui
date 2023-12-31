@@ -219,7 +219,7 @@
 {#if items.length == 0}
   <p>no data yet</p>
 {:else}
-  <p>Benchmarks run with <a href="https://github.com/sharkdp/hyperfine"><code>hyperfine</code></a> and reflect the cold-start time to solve a given day.
+  <p>Benchmarks run with <a href="https://github.com/sharkdp/hyperfine"><code>hyperfine</code></a>, averaged across available inputs, and reflect the cold-start time to solve a given day, meaning they include executable/runtime startup, reading the input file from disk, and producing the solution.
   </p>
   <p>Reported times are in milliseconds, and the best time is <span class="fastest">highlighted.</span><p>
 {/if}
