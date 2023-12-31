@@ -7,7 +7,8 @@
   export let items: Summary[] = [];
   export let days: number[] = [];
 
-  let defaultColors = ["#5ebf72", "#3f6f94", "#70b1ea", "#9d42b7", "#ea85f5", "#805d94", "#c39dd9", "#2d70f0", "#1abdc5", "#41763f", "#f85582", "#f6932e"];
+  // let defaultColors = ["#21f0b6", "#8c3ba0", "#2c97e0", "#a3553a", "#d595d9", "#2b5013", "#fca552", "#fe5360", "#bfd6fa", "#c4ce50", "#598d83", "#73f02e"];
+  let defaultColors = ["#41bbc5", "#aa8c5c", "#943112", "#7990c5", "#9ad859", "#9b4c9d", "#e81659", "#fa7922", "#6e8e3b", "#fec9af", "#55450a", "#e3a0fa"];
 
 
   let scaleOptions = ['linear', 'log'];
