@@ -12,6 +12,7 @@
   let routes = {
     '/2022': '2022',
     '/2023': '2023',
+    '/2024': '2024',
     '/About': 'About',
     '/Participate': 'Participate',
   };
@@ -20,7 +21,7 @@
     if (path in routes) {
       return routes[path];
     } else {
-      return '2023';
+      return '2024';
     }
   };
 
@@ -47,7 +48,7 @@
       </Section>
     </Row>
   </TopAppBar>
-  <TabBar tabs={['2022', '2023', 'About', 'Participate']} let:tab bind:active on:SMUITabBar:activated={navigate(active)}>
+  <TabBar tabs={['2022', '2023', '2023', 'About', 'Participate']} let:tab bind:active on:SMUITabBar:activated={navigate(active)}>
     <Tab {tab} minWidth>
       <Label>{tab}</Label>
     </Tab>
@@ -57,6 +58,8 @@
     <EventYear year={2022} />
   {:else if active == '2023'}
     <EventYear year={2023} />
+  {:else if active == '2024'}
+    <EventYear year={2024} />
   {:else if active == 'About'}
     <About />
   {:else if active == 'Participate'}

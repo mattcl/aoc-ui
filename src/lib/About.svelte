@@ -1,5 +1,5 @@
 <script lang="ts">
-  let year = 2023;
+  let year = 2024;
 
   let sourceCode = [
     {name: 'aoc-ci-bencher (CI pipeline defs)', repo: 'https://github.com/mattcl/aoc-ci-bencher' },
