@@ -14,7 +14,7 @@
     '/2023': '2023',
     '/2024': '2024',
     '/About': 'About',
-    '/Participate': 'Participate',
+//    '/Participate': 'Participate',
   };
 
   const LoadRoute = path => {
@@ -48,7 +48,7 @@
       </Section>
     </Row>
   </TopAppBar>
-  <TabBar tabs={['2022', '2023', '2024', 'About', 'Participate']} let:tab bind:active on:SMUITabBar:activated={navigate(active)}>
+  <TabBar tabs={['2022', '2023', '2024', 'About']} let:tab bind:active on:SMUITabBar:activated={navigate(active)}>
     <Tab {tab} minWidth>
       <Label>{tab}</Label>
     </Tab>
