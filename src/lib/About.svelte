@@ -37,9 +37,6 @@ and computing the solution (cold-start time). As such, there is high variance
 for times less than 5 ms, as per the hyperfine documentation, as a not
 insignificant part of that is shell startup time.</p>
 
-<p>For 2023 and onward, more detailed results can be found in the
-<a href="https://github.com/mattcl/aoc-benchmarks">benchmarks repo</a>.</p>
-
 <h3>Benchmark hardware</h3>
 
 <p>The rest of the pipeline (individual build steps and solution checking and
