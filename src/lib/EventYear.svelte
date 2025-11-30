@@ -15,7 +15,7 @@
 
   let summaries: Summary[] = [];
   let participants: Participant[] = [];
-  let num_days = if (year == 2025) { 12 } else { 25 };
+  let num_days = year == 2025 ?  12 : 25;
   let daysSel = new Array(num_days).fill(null).map((_, i) => i + 1);
   let daysFilters = makeDayFilterChunks(daysSel);
 
