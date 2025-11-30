@@ -15,7 +15,8 @@
 
   let summaries: Summary[] = [];
   let participants: Participant[] = [];
-  let daysSel = new Array(25).fill(null).map((_, i) => i + 1);
+  let num_days = if (year == 2025) { 12 } else { 25 };
+  let daysSel = new Array(num_days).fill(null).map((_, i) => i + 1);
   let daysFilters = makeDayFilterChunks(daysSel);
 
   function makeDayFilterChunks(days: number[]) {
@@ -63,7 +64,7 @@
 
   function setDayAll(state) {
     if (state == true) {
-      daysSel = new Array(25).fill(null).map((_, i) => i + 1);
+      daysSel = new Array(num_days).fill(null).map((_, i) => i + 1);
     } else {
       daysSel = [];
     }
@@ -71,7 +72,7 @@
 
   function setDayAvailable(summaries: Summary[], all: bool = false) {
     let vals = [];
-    for (let i = 1; i < 26; i++) {
+    for (let i = 1; i < num_days + 1; i++) {
       let key = `day_${i}`;
 
       if (all) {
